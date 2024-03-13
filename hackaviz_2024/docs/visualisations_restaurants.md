@@ -1,10 +1,10 @@
 ---
 theme: dashboard
-title: Restaurants
+title: Explorations sur les lieux
 toc: false
 ---
 
-# Restaurants
+# Lieux
 
 
 
@@ -30,7 +30,7 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
   </div>
 </div>
 
-<!-- Load and transform the data -->
+<!-- Load data -->
 
 ```js
 const nb_resto_par_lieux = FileAttachment("nb_resto_par_lieux.csv").csv({typed: true});
@@ -39,7 +39,12 @@ const disciplines_par_lieux = FileAttachment("disciplines_par_lieux.csv").csv({t
 const coordonnees_resto = FileAttachment("coordonnees_resto.csv").csv({typed: true});
 const coordonnees_lieux = FileAttachment("coordonnees_lieux.csv").csv({typed: true});
 const bbox_lieux = FileAttachment("bbox_lieux.csv").csv({typed: true});
+const icones_disciplines = FileAttachment("icones_disciplines.csv").csv({typed: true});
+const creneaux = FileAttachment("creneaux.csv").csv({typed: true});
+const creneaux_villes = FileAttachment("creneaux_villes.csv").csv({typed: true});
 ```
+
+
 
 <div class="grid grid-cols-4">
   <div class="card">
@@ -82,9 +87,7 @@ const graph_podium = Plot.plot({
 ```
 
 <div class="grid grid-cols-1">
-  <div class="card">
-    ${graph_podium}
-  </div>
+
 </div>
 
 ```js
@@ -103,44 +106,130 @@ const graph_disciplines = Plot.plot({
   ]
 })
 ```
-<div class="grid grid-cols-1">
+
+```js
+const picto_disciplines = Plot.plot({
+  color: {range: ["#999999", "#000000"]},
+  x: {axis: null, reverse: true},
+  y: {axis: null},
+    marks: [
+    Plot.image(
+      icones_disciplines,{
+        x: "x",
+        y: "y",
+       src: "image",        
+       fill: "present",
+       width: 40,
+       filter: d => d.lieu === choix_lieu
+      }
+    ),
+    Plot.text(
+      icones_disciplines, {
+        x: "x",
+        y: "y",
+        text: "discipline",
+        fill: "present",
+        filter: d => d.lieu === choix_lieu
+      }
+    )
+  ]
+})
+```
+
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${picto_disciplines}
+  </div>
   <div class="card">
     ${graph_disciplines}
   </div>
 </div>
 
 
+
 ```js
-const carte_resto = Plot.plot({
-  projection: "albers",
-  marks: [
-    Plot.dot(
-      coordonnees_resto,{
-        filter: d => d.lieu === choix_lieu
-      },
-      Plot.hexbin(
-        { r: "count", fill: "count" },
-        { x: "longitude", y: "latitude" }
-      )
-    )
-  ],
-  height: 500,
-  width: 800,
-  margin: 50,
-  r: { range: [0, 15] },
+const carte_densite_resto = Plot.plot({
   x : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmax)]},
   y : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymax)]},
   color: {
-    legend: true,
-    label: "Nombre de restaurants à proximite:",
-    scheme: "cool"
-  }
+    scheme: "blues"
+  },
+  marks: [
+    Plot.density(coordonnees_resto,{
+        filter: d => d.lieu === choix_lieu,
+         x: "longitude",
+      y: "latitude",
+      bandwidth: 10,
+      fill: "density"
+      }),
+    Plot.dot(coordonnees_resto,{
+        filter: d => d.lieu === choix_lieu,
+      x: "longitude",
+      y: "latitude",
+      r: 1
+    })
+  ]
 })
 ```
 
-<div class="grid grid-cols-1">
+
+```js
+const rayures = Plot.plot({
+  x: {round: true},
+  color: {scheme: "BuRd"},
+  marks: [
+    Plot.barX(creneaux, {
+      filter: d => d.lieu === choix_lieu,
+      x: "jour_creneau",
+      fill: "nb",
+      interval: "day", 
+      inset: 0 
+    })
+  ]
+})
+
+const rayures_ensemble = Plot.plot({
+  x: {round: true},
+  color: {scheme: "BuRd"},
+  marks: [
+    Plot.barX(creneaux, {
+      x: "jour_creneau",
+      fill: "nb",
+      fy: "lieu",
+      inset: 0
+    })
+  ]
+})
+
+const rayures_villes = Plot.plot({
+  x: {round: true},
+  color: {scheme: "BuRd"},
+  marks: [
+    Plot.barX(creneaux_villes, {
+      x: "jour_creneau",
+      fill: "nb",
+      fy: "ville",
+      inset: 0
+    })
+  ]
+})
+```  
+<div class="grid grid-cols-2">
+   <div class="card">
+    ${graph_podium}
+  </div>
   <div class="card">
-    ${carte_resto}
+    ${carte_resto2}
+  </div>
+</div>
+  
+ 
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${carte_densite_resto}
+  </div>
+  <div class="card">
+    ${rayures}
   </div>
 </div>
 
@@ -152,6 +241,8 @@ const carte_resto2 = Plot.plot({
       y: "latitude",
       filter : d => d.lieu === choix_lieu,
       fill: "type", 
+      tip: true,
+      title :  (d) => `${d.etablissement} \n ${d.adresse}`,
       opacity: 0.7 // Decrease opacity (0 = transparent, 1 = opaque)
     }),
     Plot.dot(coordonnees_lieux, {
@@ -171,7 +262,15 @@ const carte_resto2 = Plot.plot({
 ```
 
 <div class="grid grid-cols-1">
-  <div class="card">
-    ${carte_resto2}
+   <div class="card">
+    ${rayures_ensemble}
   </div>
 </div>
+
+<div class="grid grid-cols-1">
+   <div class="card">
+    ${rayures_villes}
+  </div>
+</div>
+
+
