@@ -6,6 +6,8 @@ toc: false
 
 # Restaurants
 
+
+
 ```js
 const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Arena Paris Nord", 
 "Arena Paris Sud", "Arena Paris Sud 1", "Arena Paris Sud 6", 
@@ -34,6 +36,9 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
 const nb_resto_par_lieux = FileAttachment("nb_resto_par_lieux.csv").csv({typed: true});
 const podium = FileAttachment("test_podium.csv").csv({typed: true});
 const disciplines_par_lieux = FileAttachment("disciplines_par_lieux.csv").csv({typed: true});
+const coordonnees_resto = FileAttachment("coordonnees_resto.csv").csv({typed: true});
+const coordonnees_lieux = FileAttachment("coordonnees_lieux.csv").csv({typed: true});
+const bbox_lieux = FileAttachment("bbox_lieux.csv").csv({typed: true});
 ```
 
 <div class="grid grid-cols-4">
@@ -101,5 +106,72 @@ const graph_disciplines = Plot.plot({
 <div class="grid grid-cols-1">
   <div class="card">
     ${graph_disciplines}
+  </div>
+</div>
+
+
+```js
+const carte_resto = Plot.plot({
+  projection: "albers",
+  marks: [
+    Plot.dot(
+      coordonnees_resto,{
+        filter: d => d.lieu === choix_lieu
+      },
+      Plot.hexbin(
+        { r: "count", fill: "count" },
+        { x: "longitude", y: "latitude" }
+      )
+    )
+  ],
+  height: 500,
+  width: 800,
+  margin: 50,
+  r: { range: [0, 15] },
+  x : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmax)]},
+  y : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymax)]},
+  color: {
+    legend: true,
+    label: "Nombre de restaurants à proximite:",
+    scheme: "cool"
+  }
+})
+```
+
+<div class="grid grid-cols-1">
+  <div class="card">
+    ${carte_resto}
+  </div>
+</div>
+
+```js
+const carte_resto2 = Plot.plot({
+  marks: [
+    Plot.dot(coordonnees_resto, {
+      x: "longitude",
+      y: "latitude",
+      filter : d => d.lieu === choix_lieu,
+      fill: "type", 
+      opacity: 0.7 // Decrease opacity (0 = transparent, 1 = opaque)
+    }),
+    Plot.dot(coordonnees_lieux, {
+      x: "longitude",
+      y: "latitude",
+      filter : d => d.lieu === choix_lieu,
+      opacity: 1 // Decrease opacity (0 = transparent, 1 = opaque)
+    })
+  ],
+  x : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.xmax)]},
+  y : {domain : [bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymin), bbox_lieux.filter(d => d.lieu === choix_lieu).map(d => d.ymax)]},
+  color: { legend: true }, // Include a legend for the fill color
+  height: 500,
+  width: 800,
+  margin: 50
+})
+```
+
+<div class="grid grid-cols-1">
+  <div class="card">
+    ${carte_resto2}
   </div>
 </div>
