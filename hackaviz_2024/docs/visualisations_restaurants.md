@@ -28,6 +28,14 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
   </div>
 </div>
 
+<!-- Load and transform the data -->
+
+```js
+const nb_resto_par_lieux = FileAttachment("nb_resto_par_lieux.csv").csv({typed: true});
+const podium = FileAttachment("test_podium.csv").csv({typed: true});
+const disciplines_par_lieux = FileAttachment("disciplines_par_lieux.csv").csv({typed: true});
+```
+
 <div class="grid grid-cols-4">
   <div class="card">
     <h2>Nombre de resto dans le coin</h2>
@@ -46,28 +54,23 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
 </div>
 
 
-<!-- Load and transform the data -->
-
 ```js
-const nb_resto_par_lieux = FileAttachment("nb_resto_par_lieux.csv").csv({typed: true});
-const podium = FileAttachment("test_podium.csv").csv({typed: true});
-```
-
-```js
-const graph = Plot.plot({
+const graph_podium = Plot.plot({
+    axis: null,
     marks: [
     Plot.barY(podium, {
-      x: "rang",
+      x: "place",
       y: "pct",
       fill: "#d38f9e",
       filter: d => d.lieu === choix_lieu
     }),
     Plot.text(podium, {
-      x : "rang",
+      x : "place",
       y : "pct",
       text : "type",
-      dy : 3,
-      fill: "#bd586e"
+      dy : -20,
+      fill: "#bd586e",
+      filter: d => d.lieu === choix_lieu
     })
   ]
 })
@@ -75,8 +78,28 @@ const graph = Plot.plot({
 
 <div class="grid grid-cols-1">
   <div class="card">
-    ${graph}
+    ${graph_podium}
   </div>
 </div>
 
-
+```js
+const graph_disciplines = Plot.plot({
+  y: {
+    axis: null,
+    domain: disciplines_par_lieux.filter(d => d.lieu === choix_lieu).sort(d => -d.n).map(d => d.discipline)
+  },
+  marks: [
+    Plot.barX(disciplines_par_lieux,{
+      x : "n",
+      y : "discipline",
+      filter : d => d.lieu === choix_lieu
+    }),
+    Plot.axisY({textAnchor: "start", fill: "white", dx: 14})
+  ]
+})
+```
+<div class="grid grid-cols-1">
+  <div class="card">
+    ${graph_disciplines}
+  </div>
+</div>
