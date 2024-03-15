@@ -7,6 +7,7 @@ toc: true
 
 ```js
 import ApexCharts from 'npm:apexcharts'
+import * as echarts from "npm:echarts";
 ```
 
 ```js
@@ -23,6 +24,7 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
 "Stade Pierre-Mauroy", "Stade Roland-Garros", "Stade tour Eiffel", 
 "Stade Yves-du-Manoir", "Trocadéro", "Vélodrome national"], {value: "Arena Bercy", label: "Choisir un site"}));
 const podium = FileAttachment("test_podium.csv").csv({typed: true});
+const type_resto_scatter = FileAttachment("type_resto_scatter.csv").csv({typed: true});
 ```
 
 ```js
@@ -42,7 +44,7 @@ var options = {
     dataLabels: {
           enabled: false
         },
-    xaxis: {show : false},
+    xaxis: {show : false, type : "category"},
     yaxis: {show : false},
     annotations:{
       texts:[{
@@ -94,3 +96,54 @@ var options = {
 ```
 <div id="chart"></div>
 --->
+
+```js
+const myChart = echarts.init(display(html`<div style="width: 600px; height:400px;"></div>`));
+
+var option;
+
+option = {
+  xAxis: {},
+  yAxis: {},
+  series: [
+    {
+      symbolSize: 20,
+      data: [
+        [10.0, 8.04, 1],
+        [8.07, 6.95, 1],
+        [13.0, 7.58, 1],
+        [9.05, 8.81, 2],
+        [11.0, 8.33, 2],
+        [14.0, 7.66, 2],
+        [13.4, 6.81, 3],
+        [10.0, 6.33, 3],
+        [14.0, 8.96, 3],
+        [12.5, 6.82, 4],
+        [9.15, 7.2, 4],
+        [11.5, 7.2, 4],
+        [3.03, 4.23, 5],
+        [12.2, 7.83, 5],
+        [2.02, 4.47, 5],
+        [1.05, 3.33, 5],
+        [4.05, 4.96, 6],
+        [6.03, 7.24, 6],
+        [12.0, 6.26, 6],
+        [12.0, 8.84, 7],
+        [7.08, 5.82, 7],
+        [5.02, 5.68, 7]
+      ],
+      type: 'scatter'
+    },{
+    symbolSize: 20,
+    color: '#BEBEBE',
+    data: [[6, 2, 10]],
+    type : 'effectScatter' }
+  ],
+};
+console.log("option:", option)
+myChart.setOption(option) 
+```
+<div id="main">
+${myChart}
+</div>
+

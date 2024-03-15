@@ -274,3 +274,13 @@ const carte_resto2 = Plot.plot({
 </div>
 
 
+```js
+var viz = require("geoviz@0.5.5")
+const test_carte = viz.tile()
+```
+
+<div class="grid grid-cols-1">
+   <div class="card">
+    ${test_carte}
+  </div>
+</div>

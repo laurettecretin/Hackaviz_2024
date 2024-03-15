@@ -82,7 +82,7 @@ x,y,discipline,image,lieu,n,present
 4,0,VTT,icones/VTT.svg,Centre national de tir,NA,non
 4,0,VTT,icones/VTT.svg,Invalides,NA,non
 4,0,VTT,icones/VTT.svg,Marina de Marseille,NA,non
-4,0,VTT,icones/VTT.svg,Colline d'Elancourt,2,oui
+4,0,VTT,./icones/VTT.svg,Colline d'Elancourt,2,oui
 4,0,VTT,icones/VTT.svg,Arena Paris Sud 1,NA,non
 4,0,VTT,icones/VTT.svg,Stade Tour Eiffel,NA,non
 4,0,VTT,icones/VTT.svg,Arena Paris Sud 6,NA,non
