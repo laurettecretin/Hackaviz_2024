@@ -27,47 +27,40 @@ const podium_type = echarts.init(display(html`<div style="width: 600px; height:4
 
 var option;
 
-const labelOption = {
-  show: true,
-  position: 'top',
-  formatter: '{name|{a}}',
-  fontSize: 16,
-  rich: {
-    name: {}
-  }
-};
+// Définir les catégories
+const categories = podium.filter(d => d.lieu === choix_lieu).map(d => d.type)
 
+// Définir les données de la série
+const data = podium.filter(d => d.lieu === choix_lieu).map(d => d.pct)
+
+// Définir les options du graphique
 option = {
-  xAxis: {
-    type: 'category',
-    data: [1],
-    show: false
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [
-    {
-      data: podium.filter(d => d.lieu === choix_lieu).map(d => d.pct).splice(0, 1),
-      name: podium.filter(d => d.lieu === choix_lieu).map(d => d.type).splice(0, 1),
-      type: 'bar',
-      label: labelOption
+    color: ['#8B0000'],
+    //, ['#C0C0C0','#FFD700', '#CD7F32'],
+    xAxis: {
+        type: 'category',
+        data: podium.filter(d => d.lieu === choix_lieu).map(d => d.type),
+        show: false
     },
-    {
-      data: podium.filter(d => d.lieu === choix_lieu).map(d => d.pct).splice(1, 1),
-      name: podium.filter(d => d.lieu === choix_lieu).map(d => d.type).splice(1, 1),
-      type: 'bar',
-      label: labelOption
+    yAxis: {
+        type: 'value',
+        axisLabel: { 
+            formatter: '{value} %' 
+        }
     },
-    {
-      data: podium.filter(d => d.lieu === choix_lieu).map(d => d.pct).splice(2, 1),
-      name: podium.filter(d => d.lieu === choix_lieu).map(d => d.type).splice(2, 1),
-      type: 'bar',
-      label: labelOption
-    }
-  ]
+    series: [{
+        name: 'pct',
+        type: 'bar',
+        data: data,
+        label: { 
+            show: true, 
+            position: 'top', 
+            formatter: '{b}' 
+        }
+    }]
 };
 
-option && podium_type.setOption(option);
-
+// Appliquer les options au graphique
+podium_type.setOption(option) 
 ```
+
