@@ -20,6 +20,7 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
 "Stade Pierre-Mauroy", "Stade Roland-Garros", "Stade tour Eiffel", 
 "Stade Yves-du-Manoir", "Trocadéro", "Vélodrome national"], {value: "Arena Bercy", label: "Choisir un site"}));
 const type_resto_scatter = FileAttachment("type_resto_scatter.csv").csv({typed: true});
+const cuisine_scatter = FileAttachment("cuisine_scatter.csv").csv({typed: true});
 ```
 
 ```js
@@ -70,4 +71,53 @@ option = {
   ],
 };
 scatterplot.setOption(option) 
+```
+```js
+const scatterplot2 = echarts.init(display(html`<div style="width: 600px; height:400px;"></div>`));
+
+var option;
+
+option = {
+  grid: {
+        left: '10%', 
+        right: '20%', 
+        bottom: '15%', 
+        containLabel: true 
+    },
+    xAxis: {
+    name: 'Part de \ncuisine \nfrançaise',
+    min: 0, max: 12,
+    axisLine: { 
+            symbol: ['none', 'arrow'], 
+            symbolSize: [8, 16], 
+            lineStyle: {
+                color: '#333' 
+                }
+            }
+    },
+  yAxis: {
+    name: 'Part de \ncuisine \ndu monde',
+    min: 0, max: 60,
+    axisLine: { 
+            symbol: ['none', 'arrow'], 
+            symbolSize: [8, 16], 
+            lineStyle: {
+                color: '#333' 
+                }
+            }
+    },
+  series: [
+    {
+      symbolSize: 8,
+    color: '#8B0000',
+      data: cuisine_scatter.filter(d => d.lieu !== choix_lieu).map( d => [d.cuisine_francaise, d.cuisine_du_monde]),
+      type: 'scatter'
+    },{
+    symbolSize: 20,
+    color: '#2E8B57',
+    data: cuisine_scatter.filter(d => d.lieu === choix_lieu).map( d => [d.cuisine_francaise, d.cuisine_du_monde]),
+    type : 'effectScatter' }
+  ],
+};
+scatterplot2.setOption(option) 
 ```

@@ -1,5 +1,5 @@
 ---
-title: scatterplot
+title: carto
 ---
 
 ```js
@@ -47,9 +47,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 const marker = L.marker([lat, long]).addTo(map);
 marker.bindPopup(`${choix_lieu}`).openPopup();
 
+const coord_boissons = coordonnees_resto.filter(d => d.lieu === choix_lieu && d.type === "Débits de boissons");
+ coord_boissons.forEach(coord_boissons => {
+            L.circleMarker([coord_boissons.latitude, coord_boissons.longitude]).addTo(map).setStyle({color: 'blue', radius: 5}).bindPopup(`${coord_boissons.etablissement}<br>${coord_boissons.adresse}`);
+        });
 const coord_rap = coordonnees_resto.filter(d => d.lieu === choix_lieu && d.type === "Restauration de type rapide");
  coord_rap.forEach(coord_rap => {
-            L.circleMarker([coord_rap.latitude, coord_rap.longitude]).addTo(map).setStyle({color: 'red', radius: 5});
+            L.circleMarker([coord_rap.latitude, coord_rap.longitude]).addTo(map).setStyle({color: 'red', radius: 5}).bindPopup(`${coord_rap.etablissement}<br>${coord_rap.adresse}`);
         });
 const coord_trad = coordonnees_resto.filter(d => d.lieu === choix_lieu && d.type === "Restauration traditionnelle");
  coord_trad.forEach(coord_trad => {
@@ -58,13 +62,10 @@ const coord_trad = coordonnees_resto.filter(d => d.lieu === choix_lieu && d.type
 
     
 
-function centerMap() {
-        map.setView([lat, long], 13);
-}
 
 
 ```
-<button onclick="centerMap()">Centrer la carte</button>
+
 
 </body>
 </html>

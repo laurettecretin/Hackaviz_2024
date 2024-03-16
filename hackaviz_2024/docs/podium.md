@@ -20,6 +20,7 @@ const choix_lieu = view(Inputs.select(["Arena Bercy", "Arena Champ-de-Mars", "Ar
 "Stade Pierre-Mauroy", "Stade Roland-Garros", "Stade tour Eiffel", 
 "Stade Yves-du-Manoir", "Trocadéro", "Vélodrome national"], {value: "Arena Bercy", label: "Choisir un site"}));
 const podium = FileAttachment("type_resto_podium.csv").csv({typed: true});
+const podium_cuisine = FileAttachment("cuisine_podium.csv").csv({typed: true});
 ```
 
 ```js
@@ -64,3 +65,44 @@ option = {
 podium_type.setOption(option) 
 ```
 
+```js
+const podium_2 = echarts.init(display(html`<div style="width: 600px; height:400px;"></div>`));
+
+var option;
+
+// Définir les catégories
+const categories_cuisine = podium_cuisine.filter(d => d.lieu === choix_lieu).map(d => d.type)
+
+// Définir les données de la série
+const data_cuisine = podium_cuisine.filter(d => d.lieu === choix_lieu).map(d => d.pct)
+
+// Définir les options du graphique
+option = {
+    color: ['#8B0000'],
+    //, ['#C0C0C0','#FFD700', '#CD7F32'],
+    xAxis: {
+        type: 'category',
+        data: podium_cuisine.filter(d => d.lieu === choix_lieu).map(d => d.type),
+        show: false
+    },
+    yAxis: {
+        type: 'value',
+        axisLabel: { 
+            formatter: '{value} %' 
+        }
+    },
+    series: [{
+        name: 'pct',
+        type: 'bar',
+        data: data_cuisine,
+        label: { 
+            show: true, 
+            position: 'top', 
+            formatter: '{b}' 
+        }
+    }]
+};
+
+// Appliquer les options au graphique
+podium_2.setOption(option) 
+```
